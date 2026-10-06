@@ -37,9 +37,11 @@ export async function saveSubmission(
   const { axes, typeId, subtypeId } = scoreProfile(input.answers, questions);
 
   const saveProfile = existing
+    // 재응시에서 선택하지 않으면 기존 값을 유지한다. 한 번 입력한 값을 비우는 경로는 없다.
     ? sql`
         UPDATE ${profiles} SET
-          nickname = ${input.nickname}, gender = ${input.gender}, age_band = ${input.ageBand},
+          nickname = ${input.nickname},
+          gender = COALESCE(${input.gender}, gender), age_band = COALESCE(${input.ageBand}, age_band),
           main_type_id = ${typeId}, subtype_id = ${subtypeId},
           novelty_score = ${axes.novelty}, structure_score = ${axes.structure},
           social_score = ${axes.social}, spend_score = ${axes.spend},
