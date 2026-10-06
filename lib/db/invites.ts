@@ -1,5 +1,6 @@
 // 서버 전용. 초대 코드를 만들고 찾는다.
 import { randomInt, randomUUID } from 'node:crypto';
+import { cache } from 'react';
 import { getSql, table } from './client.ts';
 
 const ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
@@ -30,13 +31,21 @@ export async function getOrCreateInviteCode(profileId: string): Promise<string> 
   return code;
 }
 
-// 유효한 초대 코드면 초대한 프로필의 id를 돌려준다.
-export async function findInviterId(code: string): Promise<string | null> {
+// 유효한 초대 코드면 초대한 사람의 id와 닉네임을 돌려준다. 타입·점수·토큰은 읽지 않는다.
+// cache()로 감싸서 한 요청 안에서 generateMetadata와 페이지가 DB를 두 번 조회하지 않게 한다.
+export const findInviter = cache(async (code: string): Promise<{ id: string; nickname: string } | null> => {
   if (!INVITE_CODE.test(code)) return null;
   const sql = getSql();
   const [row] = await sql`
-    SELECT inviter_profile_id FROM ${table('invites')}
-    WHERE invite_code = ${code} AND (expires_at IS NULL OR expires_at > now())
+    SELECT p.id, p.nickname
+    FROM ${table('invites')} i
+    JOIN ${table('profiles')} p ON p.id = i.inviter_profile_id
+    WHERE i.invite_code = ${code} AND (i.expires_at IS NULL OR i.expires_at > now())
   `;
-  return row?.inviter_profile_id ?? null;
+  return row ? { id: row.id, nickname: row.nickname } : null;
+});
+
+// 유효한 초대 코드면 초대한 프로필의 id를 돌려준다.
+export async function findInviterId(code: string): Promise<string | null> {
+  return (await findInviter(code))?.id ?? null;
 }
