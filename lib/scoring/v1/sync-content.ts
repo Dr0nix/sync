@@ -26,3 +26,35 @@ export const SYNC_GRADES: SyncGrade[] = [
   { min: 30, name: '기적의 우정', copy: '취향은 싸우는데 우정은 살아남음.' },
   { min: 0, name: '상극 생존자', copy: '서로의 선택을 이해하려 하지 마세요.' },
 ];
+
+// 영역별 일치율로 고르는 "둘이 잘 맞는 상황 / 의견 갈릴 상황" 문장.
+// TODO: 확정 필요 — 임시값 (문장과 임계값 전체)
+export const GOOD_MIN = 70;    // 이 점수 이상인 영역만 "잘 맞는 상황" 후보
+export const CLASH_MAX = 50;   // 이 점수 이하인 영역만 "의견 갈릴 상황" 후보
+
+export const SITUATIONS: Record<Category, { good: string; clash: string }> = {
+  food: {
+    good: '메뉴 고를 때 둘이 싸울 일이 거의 없습니다.',
+    clash: '저녁 메뉴를 정하는 데 시간이 좀 걸립니다.',
+  },
+  travel: {
+    good: '같이 여행 가도 일정으로 부딪힐 일이 적습니다.',
+    clash: '여행 스타일은 출발 전에 맞춰두는 게 좋습니다.',
+  },
+  leisure: {
+    good: '주말에 뭐 할지 금방 정해집니다.',
+    clash: '한 명은 나가고 싶고 한 명은 쉬고 싶을 수 있습니다.',
+  },
+  spend: {
+    good: '돈 쓰는 기준이 비슷해서 계산이 편합니다.',
+    clash: '어디에 얼마를 쓸지는 미리 얘기해 두세요.',
+  },
+  life: {
+    good: '생활 리듬이 비슷해서 같이 있어도 편합니다.',
+    clash: '하루를 보내는 방식이 꽤 다릅니다.',
+  },
+  social: {
+    good: '사람을 대하는 방식이 닮았습니다.',
+    clash: '모임을 대하는 온도가 서로 다릅니다.',
+  },
+};
