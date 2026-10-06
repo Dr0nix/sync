@@ -39,3 +39,27 @@ export async function shareLink(link: { url: string; text: string }): Promise<Sh
   }
   return (await copyText(link.url)) ? 'copied' : 'failed';
 }
+
+export type SaveOutcome = 'shared' | 'saved' | 'cancelled';
+
+// 이미지를 기기의 공유 창으로 넘기거나(휴대폰), 파일로 내려받는다.
+export async function saveImage(blob: Blob, filename: string): Promise<SaveOutcome> {
+  const file = new File([blob], filename, { type: blob.type });
+  if (typeof navigator.canShare === 'function' && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file] });
+      return 'shared';
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') return 'cancelled';
+    }
+  }
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+  return 'saved';
+}

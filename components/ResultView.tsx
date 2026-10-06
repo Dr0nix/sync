@@ -6,6 +6,7 @@ import type { ProfileResult } from '@/lib/api/profile-result.ts';
 import { clearPendingInvite, readPendingInvite, readToken } from '@/lib/quiz/storage.ts';
 import { InsightCard } from './InsightCard.tsx';
 import { InviteCTA } from './InviteCTA.tsx';
+import { SaveImageButton } from './SaveImageButton.tsx';
 import { SyncSummaryCard } from './SyncSummaryCard.tsx';
 import { TasteDna } from './TasteDna.tsx';
 import { TypeHeroCard } from './TypeHeroCard.tsx';
@@ -99,6 +100,7 @@ export function ResultView({ profileId }: { profileId: string }) {
       <TasteDna axes={result.axes} />
       <InsightCard title="나를 설명하는 3가지" items={result.insights} />
       <InsightCard title="내 안의 이상한 조합" items={result.paradoxes} />
+      <SaveImageButton profileId={result.profileId} />
 
       {/* 싱크로율은 내 결과 설명이 전부 끝난 뒤에 나온다. */}
       {result.matches.length > 0 && (
