@@ -53,12 +53,15 @@ describe('computeSync — 전체 점수', () => {
 
   it('비교가능 문항이 없으면 0점이고 카테고리 점수가 비어 있다', () => {
     const result = computeSync(answers({ f1: 'a' }), answers({ f2: 'a' }), QUESTIONS);
-    assert.deepEqual(result, { score: 0, comparable: 0, categoryScores: {} });
+    assert.deepEqual(result, { score: 0, comparable: 0, categoryScores: {}, matched: [], mismatched: [] });
   });
 
   it('두 사람의 순서를 바꿔도 점수가 같다', () => {
     const b = answers({ f1: 'a', f2: 'b', t1: 'b', s1: 'a' });
-    assert.deepEqual(computeSync(ALL_A, b, QUESTIONS), computeSync(b, ALL_A, QUESTIONS));
+    const ab = computeSync(ALL_A, b, QUESTIONS), ba = computeSync(b, ALL_A, QUESTIONS);
+    assert.equal(ab.score, ba.score);
+    assert.deepEqual(ab.categoryScores, ba.categoryScores);
+    assert.deepEqual(ab.matched, ba.matched);
   });
 });
 
@@ -71,5 +74,35 @@ describe('computeSync — 카테고리별 점수', () => {
   it('비교가능 문항이 없는 카테고리는 들어가지 않는다', () => {
     const b = answers({ f1: 'a', s1: 'b' });
     assert.deepEqual(computeSync(ALL_A, b, QUESTIONS).categoryScores, { food: 100, social: 0 });
+  });
+});
+
+describe('computeSync — 공통점·차이점', () => {
+  const b = answers({ f1: 'a', f2: 'a', f3: 'b', f4: 'b', t1: 'b', t2: 'd', s1: 'a', s2: 'b' });
+
+  it('공통점에는 같이 고른 선택지를, 차이점에는 두 사람의 선택을 인자 순서대로 담는다', () => {
+    const result = computeSync(ALL_A, b, QUESTIONS, 'seed');
+    for (const m of result.matched) {
+      assert.ok(['f1', 'f2', 's1'].includes(m.questionId));
+      assert.equal(m.answer, 'a');
+    }
+    assert.equal(result.matched.length, 3);
+    const t2 = result.mismatched.find(m => m.questionId === 't2');
+    assert.deepEqual(t2, { questionId: 't2', a: 'a', b: 'd' });
+  });
+
+  it('문항 수가 많아도 5개씩만 담고 문구는 담지 않는다', () => {
+    const big = Array.from({ length: 30 }, (_, i) => q(`x${i}`, ['food', 'travel', 'life'][i % 3]));
+    const mine = answers(Object.fromEntries(big.map(x => [x.id, 'a'])));
+    const yours = answers(Object.fromEntries(big.map((x, i) => [x.id, i % 2 ? 'a' : 'b'])));
+    const result = computeSync(mine, yours, big, 'seed');
+    assert.equal(result.matched.length, 5);
+    assert.equal(result.mismatched.length, 5);
+    assert.deepEqual(Object.keys(result.matched[0]).sort(), ['answer', 'questionId']);
+    assert.deepEqual(Object.keys(result.mismatched[0]).sort(), ['a', 'b', 'questionId']);
+  });
+
+  it('seed가 바뀌어도 점수는 그대로다', () => {
+    assert.equal(computeSync(ALL_A, b, QUESTIONS, 'x').score, computeSync(ALL_A, b, QUESTIONS, 'y').score);
   });
 });
