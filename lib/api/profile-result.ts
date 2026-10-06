@@ -9,4 +9,6 @@ export type ProfileResult = {
   axes: Axes;
   insights: string[];
   paradoxes: string[];
+  // 내가 비교한 친구. 친구마다 가장 최근 매치 하나, 최신순.
+  matches: { matchId: string; nickname: string; score: number; gradeName: string }[];
 };
