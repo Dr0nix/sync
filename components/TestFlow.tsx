@@ -35,6 +35,8 @@ export function TestFlow({ questions, version }: { questions: TestQuestion[]; ve
   if (!draft || submitted) return <div className="flex-1" aria-busy="true" />;
 
   const total = questions.length;
+  // draft가 있다는 건 브라우저라는 뜻이다. 선택지 순서의 seed로 익명 토큰을 쓴다.
+  const seed = getOrCreateToken();
 
   const submit = async () => {
     if (inFlight.current) return;
@@ -46,7 +48,7 @@ export function TestFlow({ questions, version }: { questions: TestQuestion[]; ve
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          anonymousToken: getOrCreateToken(),
+          anonymousToken: seed,
           nickname: draft.nickname,
           gender: draft.gender,
           ageBand: draft.ageBand,
@@ -125,6 +127,7 @@ export function TestFlow({ questions, version }: { questions: TestQuestion[]; ve
       {header}
       <QuestionCard
         key={question.id}
+        seed={seed}
         question={question}
         selected={draft.answers[question.id]}
         onSelect={key => {
