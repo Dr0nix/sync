@@ -9,12 +9,12 @@
 
 ## 스택 (고정)
 
-Next.js App Router + TypeScript / Tailwind / Supabase Postgres / Vercel
+Next.js App Router + TypeScript / Tailwind / Neon Postgres / Vercel
 백엔드 = Next.js Route Handler. 별도 서버 없음. **새 의존성 추가 전 확인받을 것.**
 
 ## 절대 규칙
 
-1. **브라우저에서 Supabase를 직접 호출하지 않는다.** 모든 DB 접근은 Route Handler 경유. service role key는 서버 환경변수에만.
+1. **브라우저에서 DB를 직접 호출하지 않는다.** 모든 DB 접근은 Route Handler 경유. `DATABASE_URL`은 서버 환경변수에만(`NEXT_PUBLIC_` 접두사 금지).
 2. **채점은 100% 서버에서.** 축 점수·타입 판정·SYNC 계산·Insight 생성 전부 `lib/scoring/v1/`. 클라가 계산한 점수를 저장하지 않는다.
 3. **상대의 원본 응답을 클라이언트로 내려보내지 않는다.** 비교 결과는 서버가 추린 공통점/차이점만.
 4. **문항·타입·Insight 문장을 코드에 하드코딩하지 않는다.** 데이터로 분리.
