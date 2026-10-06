@@ -24,15 +24,15 @@ TEST → TYPE → SHARE → FRIEND TEST → SYNC → SHARE AGAIN
 | --- | --- |
 | Frontend | Next.js (App Router) + TypeScript |
 | Styling | Tailwind CSS, 모바일 우선 |
-| DB | Supabase Postgres |
-| Auth | Supabase Auth (Sprint 3에서 선택적 로그인만) |
+| DB | Neon Postgres (`@neondatabase/serverless`) |
+| Auth | 미정 — Sprint 3에서 선택적 로그인 방식을 정한다 |
 | 보안 | Row Level Security |
 | Deploy | Vercel |
 | Analytics | PostHog 또는 GA4 |
 | 공유 이미지 | Next.js OG Image (서버 생성) |
 
 **백엔드는 별도 서버가 아니라 Next.js Route Handler(Node 런타임)다.** Java/Spring 미사용.
-Supabase는 DB 레이어로만 쓰고, 애플리케이션 로직은 전부 Route Handler에 둔다.
+Neon은 DB 레이어로만 쓰고, 애플리케이션 로직은 전부 Route Handler에 둔다.
 
 ### 쓰지 않는 것 (원가/복잡도 이유)
 
@@ -44,8 +44,8 @@ Supabase는 DB 레이어로만 쓰고, 애플리케이션 로직은 전부 Route
 
 - Vercel Hobby는 **비상업용 전용**. AdSense를 붙이는 순간 Pro($20/월) 필요.
   → 광고는 베타 이후에 붙인다. 개발·베타 기간엔 Hobby로 $0.
-- Supabase 무료 티어는 상업적 이용 허용. 단 **7일간 DB 활동이 없으면 프로젝트 자동 정지**(복구 시 ~30초 콜드스타트).
-  → GitHub Actions로 하루 1회 ping하는 워크플로를 Sprint 1에 같이 만든다.
+- Neon은 유휴 상태가 이어지면 compute를 자동으로 멈추고, 다음 접속 때 다시 깨운다(첫 요청에 콜드스타트).
+  → 깨우기 위한 ping 워크플로는 만들지 않는다.
 - 서버리스 특성상 트래픽이 없으면 비용도 0에 수렴한다. 상시 인스턴스를 추가하지 말 것.
 - **CPU를 가장 많이 먹는 건 OG 이미지 생성**이다. 카톡·인스타 크롤러가 반복 요청하므로 반드시 캐싱한다(§14 Sprint 2).
 
@@ -233,6 +233,8 @@ Final Sync = 0.7 × Item-level similarity + 0.3 × Axis-profile similarity
 
 ## 5. 데이터 모델
 
+테이블은 Neon DB의 `sync` 스키마(환경변수 `DB_SCHEMA`)에 만든다.
+
 ```sql
 -- 응답자 프로필 (익명 우선, 로그인은 나중에 귀속)
 CREATE TABLE profiles (
@@ -273,12 +275,14 @@ CREATE TABLE questions (
 
 CREATE TABLE responses (
   id            UUID PRIMARY KEY,
-  profile_id    UUID REFERENCES profiles(id) ON DELETE CASCADE,
-  question_id   UUID REFERENCES questions(id),
+  profile_id    UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  attempt_no    INT NOT NULL DEFAULT 1,   -- 재응시 회차. profiles 점수는 최신 회차 기준 캐시
+  question_id   UUID NOT NULL REFERENCES questions(id),
   answer        VARCHAR,
   numeric_value FLOAT NULL,
   test_version  INT,
-  answered_at   TIMESTAMP DEFAULT now()
+  answered_at   TIMESTAMP DEFAULT now(),
+  UNIQUE (profile_id, attempt_no, question_id)   -- 회차당 문항 응답 1건. profile_id 조회 인덱스 겸용
 );
 
 CREATE TABLE invites (
@@ -294,6 +298,8 @@ CREATE TABLE matches (
   id                UUID PRIMARY KEY,
   profile_a_id      UUID REFERENCES profiles(id),
   profile_b_id      UUID REFERENCES profiles(id),
+  profile_a_attempt INT NOT NULL,   -- 비교에 쓴 회차. 재채점 시 같은 응답으로 재현하기 위함
+  profile_b_attempt INT NOT NULL,
   mode              VARCHAR,
   sync_score        FLOAT,
   category_scores   JSONB,
@@ -369,10 +375,10 @@ Route Handler / 재계산 배치 / 유닛 테스트 **세 곳에서 재사용**�
 | `GET /api/profile/[id]` | 결과 조회 (본인 토큰 검증) |
 | `GET /api/match/[id]` | 비교 결과 조회 |
 
-### 6.4 Supabase 접근 규칙
+### 6.4 DB 접근 규칙
 
-**브라우저에서 Supabase 클라이언트를 직접 호출하지 않는다.** anon key를 프론트에 노출하지 말 것.
-모든 DB 접근은 Route Handler 경유, service role key는 서버 환경변수에만 둔다.
+**브라우저에서 DB를 직접 호출하지 않는다.** 연결 문자열과 DB 클라이언트가 클라이언트 번들에 들어가면 안 된다.
+모든 DB 접근은 Route Handler 경유, `DATABASE_URL`은 서버 환경변수에만 둔다(`NEXT_PUBLIC_` 접두사 금지).
 
 RLS를 촘촘히 짜는 대신 접근 경로를 하나로 막는 방식이다. `responses` 테이블은 남의 행이 절대 읽히면 안 되는데, 클라 직접 접근을 허용하면 정책 하나만 틀려도 전체 응답이 새어나간다.
 
@@ -667,7 +673,6 @@ if (novelty > 70 && structure < 35)
 - [ ] Prototype 기반 타입 판정
 - [ ] 개인 결과 화면 (막대 + Insight 룰)
 - [ ] `scripts/recompute.ts` — responses 기준 전체 재채점 스크립트
-- [ ] GitHub Actions daily ping (Supabase 7일 정지 방지)
 
 **완료 기준:** 혼자 들어와 테스트하고 자기 타입을 볼 수 있다.
 
@@ -775,7 +780,7 @@ save_profile_click    login_complete
 
 | 금지 | 왜 |
 | --- | --- |
-| 브라우저에서 Supabase 클라이언트 직접 호출 | `responses` 테이블이 새면 §12 정책 전체가 무너짐. 튜토리얼 기본 패턴이라 특히 주의 |
+| 브라우저에서 DB 직접 호출 | `responses` 테이블이 새면 §12 정책 전체가 무너짐. 튜토리얼 기본 패턴이라 특히 주의 |
 | 클라이언트에서 축 점수·타입·SYNC 계산 | §6.1 |
 | 클라가 계산한 점수를 POST해서 저장 | 위조 가능 |
 | 12개 타입·Insight 문장을 JSX/컴포넌트 안에 하드코딩 | 데이터로 분리해야 나중에 교체 가능 |
@@ -814,8 +819,8 @@ UI·컴포넌트는 마음껏 고쳐도 되지만, **테이블 스키마와 API 
 
 - `lib/scoring/v1/*` — 채점이 틀리면 제품 전체가 무의미
 - `app/api/**/route.ts` — 권한 경계
-- Supabase 키를 참조하는 모든 파일 — service role이 클라로 새지 않았는지
-- `supabase/migrations/*` — 스키마
+- `DATABASE_URL`을 참조하는 모든 파일 — 연결 문자열이 클라로 새지 않았는지
+- `db/migrations/*` — 스키마
 
 나머지(화면, 스타일, 애니메이션)는 눈으로 보고 판단하면 되니까 위임해도 된다.
 
