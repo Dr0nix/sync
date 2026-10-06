@@ -30,7 +30,10 @@ export type Prototype = {
 // balance_player 판정 규칙: 전 축 |x-50| < BALANCE_BAND (스펙 §3.3.1)
 export const BALANCE_BAND = 15;
 // 1·2등 거리 차가 이 값 미만이면 2등을 subtype으로 (스펙 §3.3.1)
-export const SUBTYPE_GAP = 3;
+// TODO: 확정 필요 — 임시값
+// 현재 PROTOTYPES와 가상 분포 기준으로 subtype 비율이 15~20%가 되도록 맞춘 값이다.
+// PROTOTYPES를 바꾸면 scripts/simulate-types.ts로 비율을 다시 확인할 것.
+export const SUBTYPE_GAP = 1;
 
 // TODO: 확정 필요 — 임시값
 // planned_hedonist만 스펙 §3.3 예시 그대로이고, 나머지는 타입명·대표 성향(§3.4)에 맞춰 잡은 초안이다.

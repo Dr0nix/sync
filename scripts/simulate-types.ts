@@ -7,6 +7,7 @@ const N = Number(process.argv[2] ?? 10_000);
 const SEED = Number(process.argv[3] ?? 1);
 const MEAN = 50, SD = 18;   // 스펙 §14 Sprint 0: 균등난수보다 실제 응답 분포에 가깝다
 const MAX_SHARE = 30;
+const TOP_PAIRS = 6;
 
 // 결과를 재현할 수 있도록 시드 고정 난수(mulberry32)를 쓴다.
 function mulberry32(seed: number) {
@@ -36,12 +37,18 @@ function randomUser(): Axes {
 }
 
 const counts = Object.fromEntries(TYPE_IDS.map(id => [id, 0])) as Record<TypeId, number>;
+// Prototype 간 거리 순서와 실제 사용자가 헷갈리는 순서는 다르다. (메인, subtype) 쌍을 순서 없이 센다.
+const pairCounts = new Map<string, number>();
 let withSubtype = 0;
 
 for (let i = 0; i < N; i++) {
   const { typeId, subtypeId } = resolveType(randomUser());
   counts[typeId]++;
-  if (subtypeId) withSubtype++;
+  if (subtypeId) {
+    withSubtype++;
+    const key = [typeId, subtypeId].sort().join(' ↔ ');
+    pairCounts.set(key, (pairCounts.get(key) ?? 0) + 1);
+  }
 }
 
 console.log(`가상 사용자 ${N}명 (축별 정규분포 평균 ${MEAN} / 표준편차 ${SD}, seed ${SEED})\n`);
@@ -56,3 +63,9 @@ for (const id of sorted) {
 const shares = sorted.map(id => (counts[id] / N) * 100);
 console.log(`\n최대 ${shares[0].toFixed(1)}% / 최소 ${shares[shares.length - 1].toFixed(1)}%`);
 console.log(`subtype이 붙는 경계 사용자: ${((withSubtype / N) * 100).toFixed(1)}%`);
+
+console.log(`\n가장 많이 헷갈리는 타입 쌍 ${TOP_PAIRS}개 (메인 ↔ subtype, 전체 사용자 대비)`);
+const topPairs = [...pairCounts].sort((a, b) => b[1] - a[1]).slice(0, TOP_PAIRS);
+for (const [pair, n] of topPairs) {
+  console.log(`  ${((n / N) * 100).toFixed(1).padStart(4)}%  ${pair}`);
+}
