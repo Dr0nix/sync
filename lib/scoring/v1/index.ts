@@ -24,3 +24,8 @@ export function scoreProfile(responses: ResponseItem[], questions: QuestionMeta[
 
 export type { QuestionMeta, ResponseItem } from './axes.ts';
 export type { Axes, Axis, TypeId } from './prototypes.ts';
+
+export { computeSync, type SyncResult } from './sync.ts';
+export { gradeFor } from './sync-grade.ts';
+export type { MatchedItem, MismatchedItem } from './sync-items.ts';
+export { selectSituations } from './sync-situations.ts';
