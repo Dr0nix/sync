@@ -15,6 +15,7 @@ export type SavedSubmission = { profileId: string; attemptNo: number };
 // 응답 저장 → 채점 → profiles 캐시 갱신을 한 트랜잭션으로 처리한다.
 // 같은 토큰의 프로필이 이미 있으면 새 프로필을 만들지 않고 다음 회차로 쌓는다.
 // 같은 회차가 동시에 두 번 들어오면 responses 고유 제약에 걸리고, 이때 'conflict'를 돌려준다.
+// 새 토큰이 동시에 두 번 들어오면 profiles.anonymous_token 유일 제약에 걸리고, 이때도 'conflict'를 돌려준다.
 export async function saveSubmission(
   input: SubmitInput,
   questions: QuestionMeta[],

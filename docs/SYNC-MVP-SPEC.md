@@ -240,7 +240,7 @@ Final Sync = 0.7 × Item-level similarity + 0.3 × Axis-profile similarity
 CREATE TABLE profiles (
   id                 UUID PRIMARY KEY,
   owner_user_id      UUID NULL,
-  anonymous_token    VARCHAR NOT NULL,
+  anonymous_token    VARCHAR NOT NULL UNIQUE,   -- 토큰당 프로필 1개
   nickname           VARCHAR NOT NULL,
   gender             VARCHAR NULL,
   age_band           VARCHAR NULL,
