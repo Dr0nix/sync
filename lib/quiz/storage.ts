@@ -89,3 +89,10 @@ export function createDraftStore(questions: TestQuestion[], version: number) {
 }
 
 export type DraftStore = ReturnType<typeof createDraftStore>;
+
+// 초대 링크로 들어온 사람의 초대 코드. 테스트를 마치고 매치가 만들어질 때까지 기억한다.
+const INVITE_KEY = 'sync.pendingInvite';
+
+export const readPendingInvite = (): string | null => read(INVITE_KEY);
+export const savePendingInvite = (code: string) => write(INVITE_KEY, code);
+export const clearPendingInvite = () => write(INVITE_KEY, null);
