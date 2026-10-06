@@ -160,7 +160,8 @@ function resolveType(user: Axes): { typeId: TypeId; subtypeId: TypeId | null } {
     .sort((a, b) => a.d - b.d);
 
   // 1·2등이 거의 붙어 있으면 경계 사용자 → 2등을 subtype으로
-  const subtypeId = (ranked[1].d - ranked[0].d) < 3 ? ranked[1].id : null;
+  // 임계값 1은 임시값. subtype 비율이 15~20%가 되도록 시뮬레이션으로 맞춘다(3이면 약 40%에 붙는다).
+  const subtypeId = (ranked[1].d - ranked[0].d) < 1 ? ranked[1].id : null;
   return { typeId: ranked[0].id, subtypeId };
 }
 ```
