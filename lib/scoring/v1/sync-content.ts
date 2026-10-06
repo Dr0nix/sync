@@ -15,15 +15,18 @@ export const CATEGORY_LABELS: Record<Category, string> = {
 
 export type SyncGrade = { min: number; name: string; copy: string };
 
-// 스펙 §4 등급명 그대로. 점수가 min 이상인 첫 등급을 쓴다(높은 등급부터).
+// 등급명과 카피는 스펙 §4 그대로. 점수가 min 이상인 첫 등급을 쓴다(높은 등급부터).
+// TODO: 확정 필요 — 임시값 (경계값)
+// 2지선다라 모르는 사람끼리도 약 50점, 같은 사람의 재응시도 100점이 안 나온다. 응답 모델 시뮬레이션의 친구 쌍 분위수로 잡은 값이다.
+// 베타 후 matches.sync_score 분포와 재응시(attempt_no 1 vs 2) 자기 일치율로 다시 잡는다.
 export const SYNC_GRADES: SyncGrade[] = [
-  { min: 95, name: 'CTRL+C CTRL+V', copy: '이 정도면 한 사람이 두 계정 쓰는 수준.' },
-  { min: 90, name: '취향 쌍둥이', copy: '고를 때마다 서로 쳐다볼 가능성 높음.' },
-  { min: 80, name: '찐친 정배', copy: '같이 놀면 웬만하면 실패하지 않음.' },
-  { min: 70, name: '제법 잘 맞음', copy: '다르긴 한데 그게 문제될 정도는 아님.' },
-  { min: 60, name: '다름을 즐기는 사이', copy: '취향보다 사람이 좋아서 친구인 듯.' },
-  { min: 50, name: '우리가 왜 친하지?', copy: '데이터로는 설명이 잘 안 됩니다.' },
-  { min: 30, name: '기적의 우정', copy: '취향은 싸우는데 우정은 살아남음.' },
+  { min: 85, name: 'CTRL+C CTRL+V', copy: '이 정도면 한 사람이 두 계정 쓰는 수준.' },
+  { min: 78, name: '취향 쌍둥이', copy: '고를 때마다 서로 쳐다볼 가능성 높음.' },
+  { min: 70, name: '찐친 정배', copy: '같이 놀면 웬만하면 실패하지 않음.' },
+  { min: 62, name: '제법 잘 맞음', copy: '다르긴 한데 그게 문제될 정도는 아님.' },
+  { min: 55, name: '다름을 즐기는 사이', copy: '취향보다 사람이 좋아서 친구인 듯.' },
+  { min: 48, name: '우리가 왜 친하지?', copy: '데이터로는 설명이 잘 안 됩니다.' },
+  { min: 40, name: '기적의 우정', copy: '취향은 싸우는데 우정은 살아남음.' },
   { min: 0, name: '상극 생존자', copy: '서로의 선택을 이해하려 하지 마세요.' },
 ];
 
