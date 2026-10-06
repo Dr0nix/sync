@@ -16,16 +16,25 @@ const client = new Client(databaseUrl());
 await client.connect();
 
 try {
-  await client.query(`CREATE SCHEMA IF NOT EXISTS "${schema}"`);
-  // 적용 이력 테이블. 스펙 §5의 데이터 모델과는 별개인 관리용 테이블이다.
-  await client.query(`
-    CREATE TABLE IF NOT EXISTS "${schema}".schema_migrations (
-      filename   VARCHAR PRIMARY KEY,
-      applied_at TIMESTAMP DEFAULT now()
-    )
-  `);
+  // --dry는 DB에 아무것도 쓰지 않는다. 이력 테이블이 아직 없으면 전부 대기로 본다.
+  const { rows: [{ exists }] } = await client.query(
+    `SELECT to_regclass($1) IS NOT NULL AS exists`, [`"${schema}".schema_migrations`],
+  );
 
-  const { rows } = await client.query(`SELECT filename FROM "${schema}".schema_migrations`);
+  if (!dry) {
+    await client.query(`CREATE SCHEMA IF NOT EXISTS "${schema}"`);
+    // 적용 이력 테이블. 스펙 §5의 데이터 모델과는 별개인 관리용 테이블이다.
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS "${schema}".schema_migrations (
+        filename   VARCHAR PRIMARY KEY,
+        applied_at TIMESTAMP DEFAULT now()
+      )
+    `);
+  }
+
+  const { rows } = exists || !dry
+    ? await client.query(`SELECT filename FROM "${schema}".schema_migrations`)
+    : { rows: [] };
   const applied = new Set(rows.map(r => r.filename as string));
   const pending = files.filter(f => !applied.has(f));
 
