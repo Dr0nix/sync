@@ -107,3 +107,13 @@ export async function loadOwnProfile(id: string, anonymousToken: string): Promis
     },
   };
 }
+
+// 토큰의 주인 프로필 id. 테스트를 마친(채점된) 프로필만 찾는다.
+export async function findProfileIdByToken(anonymousToken: string): Promise<string | null> {
+  const sql = getSql();
+  const [row] = await sql`
+    SELECT id FROM ${table('profiles')}
+    WHERE anonymous_token = ${anonymousToken} AND main_type_id IS NOT NULL
+  `;
+  return row?.id ?? null;
+}
