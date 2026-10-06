@@ -9,8 +9,9 @@ import { PROTOTYPES, type TypeId } from '@/lib/scoring/v1/prototypes.ts';
 const PREVIEW_TYPE: TypeId = 'planned_hedonist';
 const PREVIEW_NICKNAME = '지승';
 
+// 메인(/)과 초대 화면(/i/[inviteCode])이 같이 쓴다. 초대 화면에서도 초대자 정보는 보여주지 않는다.
 // 서버 컴포넌트. 타입 데이터는 여기서 읽어 HTML로만 내려간다.
-export default function Home() {
+export function Landing() {
   const preview = TYPE_CONTENT[PREVIEW_TYPE];
 
   return (
