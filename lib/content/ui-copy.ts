@@ -15,3 +15,10 @@ export const GENDER_LABELS: Record<string, string> = { male: '남성', female: '
 export const AGE_BAND_LABELS: Record<string, string> = {
   '10s': '10대', '20s': '20대', '30s': '30대', '40s_plus': '40대 이상',
 };
+
+// TODO: 확정 필요 — 임시값 (공유할 때 링크와 함께 나가는 문구)
+export const SHARE_COPY = {
+  invite: (typeName: string) => `내 취향 타입은 ${typeName}. 너는 뭐 나와?`,
+  match: (me: string, friend: string, score: number, gradeName: string) =>
+    `${me} × ${friend} SYNC ${score}% · ${gradeName}`,
+};
