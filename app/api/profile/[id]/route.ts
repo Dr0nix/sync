@@ -1,4 +1,5 @@
 // GET /api/profile/[id] — 본인 결과 조회. x-anonymous-token 헤더가 프로필의 토큰과 같아야 한다 (스펙 §6.3)
+import type { ProfileResult } from '@/lib/api/profile-result.ts';
 import { isUuid } from '@/lib/api/submit-input.ts';
 import { loadOwnProfile } from '@/lib/db/profiles.ts';
 import { TYPE_CONTENT } from '@/lib/scoring/v1/content.ts';
@@ -23,11 +24,11 @@ export async function GET(request: Request, ctx: RouteContext<'/api/profile/[id]
       profileId: profile.id,
       nickname: profile.nickname,
       type: { id: profile.typeId, name: type.name, tagline: type.tagline },
-      subtype: subtype && { id: profile.subtypeId, name: subtype.name },
+      subtype: subtype && profile.subtypeId ? { id: profile.subtypeId, name: subtype.name } : null,
       axes: profile.axes,
       // Insight는 저장하지 않고 캐시된 점수로 매번 만든다.
       ...selectInsights(profile.axes, profile.typeId),
-    },
+    } satisfies ProfileResult,
     { headers: { 'Cache-Control': 'private, no-store' } },
   );
 }
