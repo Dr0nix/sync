@@ -298,8 +298,8 @@ CREATE TABLE invites (
 
 CREATE TABLE matches (
   id                UUID PRIMARY KEY,
-  profile_a_id      UUID REFERENCES profiles(id),
-  profile_b_id      UUID REFERENCES profiles(id),
+  profile_a_id      UUID NOT NULL REFERENCES profiles(id),   -- 두 프로필 중 id가 작은 쪽. 누가 초대했는지와 무관
+  profile_b_id      UUID NOT NULL REFERENCES profiles(id),
   profile_a_attempt INT NOT NULL,   -- 비교에 쓴 회차. 재채점 시 같은 응답으로 재현하기 위함
   profile_b_attempt INT NOT NULL,
   mode              VARCHAR,
