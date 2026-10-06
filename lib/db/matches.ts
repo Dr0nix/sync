@@ -45,7 +45,7 @@ export async function createOrGetMatch(profileX: string, profileY: string): Prom
     rows.filter(r => r.profile_id === profileId).map(r => ({ questionId: r.question_id, answer: r.answer }));
 
   const id = randomUUID();
-  const sync = computeSync(of(a), of(b), questions, id);
+  const sync = computeSync(of(a), of(b), questions, `${a}:${b}`);   // a < b로 정렬된 쌍이라 누가 초대했든 같은 값
 
   // 동시에 두 번 들어오면 한쪽은 유일 제약에 걸려 아무것도 넣지 않는다. 그때는 먼저 들어간 매치를 돌려준다.
   const [inserted] = await sql`
