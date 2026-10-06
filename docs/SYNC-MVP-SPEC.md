@@ -275,12 +275,14 @@ CREATE TABLE questions (
 
 CREATE TABLE responses (
   id            UUID PRIMARY KEY,
-  profile_id    UUID REFERENCES profiles(id) ON DELETE CASCADE,
-  question_id   UUID REFERENCES questions(id),
+  profile_id    UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  attempt_no    INT NOT NULL DEFAULT 1,   -- 재응시 회차. profiles 점수는 최신 회차 기준 캐시
+  question_id   UUID NOT NULL REFERENCES questions(id),
   answer        VARCHAR,
   numeric_value FLOAT NULL,
   test_version  INT,
-  answered_at   TIMESTAMP DEFAULT now()
+  answered_at   TIMESTAMP DEFAULT now(),
+  UNIQUE (profile_id, attempt_no, question_id)   -- 회차당 문항 응답 1건. profile_id 조회 인덱스 겸용
 );
 
 CREATE TABLE invites (
@@ -296,6 +298,8 @@ CREATE TABLE matches (
   id                UUID PRIMARY KEY,
   profile_a_id      UUID REFERENCES profiles(id),
   profile_b_id      UUID REFERENCES profiles(id),
+  profile_a_attempt INT NOT NULL,   -- 비교에 쓴 회차. 재채점 시 같은 응답으로 재현하기 위함
+  profile_b_attempt INT NOT NULL,
   mode              VARCHAR,
   sync_score        FLOAT,
   category_scores   JSONB,
