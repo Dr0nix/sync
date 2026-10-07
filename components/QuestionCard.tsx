@@ -16,7 +16,7 @@ export function QuestionCard({
 
   return (
     <div className="animate-rise flex flex-1 flex-col">
-      <h1 className="flex flex-1 items-center py-8 text-3xl font-bold leading-tight tracking-tight break-keep">
+      <h1 className="flex flex-1 items-center py-6 text-3xl font-bold leading-tight tracking-tight break-keep">
         {question.text}
       </h1>
       <div className="flex flex-col gap-3">
@@ -25,6 +25,7 @@ export function QuestionCard({
             key={option.key}
             label={option.label}
             selected={selected === option.key}
+            compact={options.length > 2}
             onSelect={() => onSelect(option.key)}
           />
         ))}
