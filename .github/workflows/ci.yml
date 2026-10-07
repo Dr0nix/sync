@@ -1,0 +1,26 @@
+name: CI
+
+# dev·main으로 가는 PR마다 lint, 테스트, 빌드를 돌린다. DB에는 접속하지 않는다.
+on:
+  pull_request:
+    branches: [dev, main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      # 타입 검사는 빌드에 포함돼 있다.
+      - run: npm run build
