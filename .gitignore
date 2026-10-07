@@ -2,6 +2,8 @@ node_modules/
 .next/
 out/
 .vercel/
+*.tsbuildinfo
+next-env.d.ts
 
 .env
 .env.*
@@ -10,3 +12,6 @@ out/
 .idea/
 .DS_Store
 *.log
+
+# 로컬 전용 PR 리뷰 기록
+docs/PR_HISTORY.md
