@@ -1,5 +1,6 @@
 // 서버 전용. 매치를 만들고 조회한다. 두 사람의 원본 응답은 여기서만 읽고 밖으로 내보내지 않는다(스펙 §12).
 import { randomUUID } from 'node:crypto';
+import { cache } from 'react';
 import type { MatchSide, QuestionTexts, StoredMatch, Viewer } from '../api/match-view.ts';
 import { SCORING_VERSION, computeSync, type ResponseItem } from '../scoring/v1/index.ts';
 import { getSql, table } from './client.ts';
@@ -136,3 +137,20 @@ export async function listFriendMatches(profileId: string): Promise<FriendMatch[
   `;
   return rows.map(r => ({ matchId: r.id, nickname: r.nickname, score: r.sync_score }));
 }
+
+export type MatchSummary = { a: string; b: string; score: number };
+
+// 누구에게나 공개되는 범위(닉네임·점수)만 읽는다. 공유 미리보기의 제목과 이미지에 쓴다.
+// cache()로 감싸서 한 요청 안에서 generateMetadata와 다른 호출이 DB를 두 번 조회하지 않게 한다.
+export const loadMatchSummary = cache(async (id: string): Promise<MatchSummary | null> => {
+  const sql = getSql();
+  const profiles = table('profiles');
+  const [row] = await sql`
+    SELECT m.sync_score, pa.nickname AS a_nickname, pb.nickname AS b_nickname
+    FROM ${table('matches')} m
+    JOIN ${profiles} pa ON pa.id = m.profile_a_id
+    JOIN ${profiles} pb ON pb.id = m.profile_b_id
+    WHERE m.id = ${id}
+  `;
+  return row ? { a: row.a_nickname, b: row.b_nickname, score: row.sync_score } : null;
+});

@@ -29,3 +29,11 @@ export const INVITE_PREVIEW = {
   title: (nickname: string) => `${nickname}님이 나랑 취향이 얼마나 겹치는지 궁금해해요`,
   description: '생일도 별자리도 필요 없어요. 둘이 직접 고른 답으로 비교해요.',
 };
+
+// SYNC 결과 링크를 메신저에 붙였을 때 미리보기에 나오는 문구. 제3자에게 공개되는 범위만 쓴다.
+// TODO: 확정 필요 — 임시값
+export const MATCH_PREVIEW = {
+  title: (a: string, b: string, score: number) => `${a} × ${b} SYNC ${score}%`,
+  description: (gradeName: string, gradeCopy: string) => `${gradeName} · ${gradeCopy}`,
+  fallbackAlt: 'SYNC 결과',
+};
