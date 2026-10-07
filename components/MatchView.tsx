@@ -97,7 +97,7 @@ export function MatchView({ matchId }: { matchId: string }) {
 
       {detail && detail.matched.length > 0 && (
         <section className="flex flex-col gap-3">
-          <h2 className="text-xl font-bold tracking-tight">같은 응답을 했어요!</h2>
+          <h2 className="text-xl font-bold tracking-tight">🔥 같은 응답을 했어요!</h2>
           <ul className="flex flex-col gap-2">
             {detail.matched.map(item => <MatchItemCard key={item.question} question={item.question} answer={item.answer} />)}
           </ul>
@@ -106,7 +106,7 @@ export function MatchView({ matchId }: { matchId: string }) {
 
       {detail && detail.mismatched.length > 0 && (
         <section className="flex flex-col gap-3">
-          <h2 className="text-xl font-bold tracking-tight">여기선 갈렸어요</h2>
+          <h2 className="text-xl font-bold tracking-tight">💥 여기선 갈렸어요</h2>
           <ul className="flex flex-col gap-2">
             {detail.mismatched.map(item => (
               <MatchItemCard
