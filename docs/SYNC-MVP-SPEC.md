@@ -379,6 +379,8 @@ Route Handler / 재계산 배치 / 유닛 테스트 **세 곳에서 재사용**�
 | `POST /api/match` | 초대 코드의 주인과 나의 최신 회차 responses를 **서버에서만** 읽음 → SYNC 계산 → matches 저장 → §12 허용 범위만 반환 |
 | `GET /api/profile/[id]` | 결과 조회 (본인 토큰 검증). 내가 비교한 친구 목록 포함 |
 | `GET /api/match/[id]` | 비교 결과 조회. 당사자에게는 상세, 제3자에게는 닉네임·점수·등급만 |
+| `GET /api/profile/[id]/image` | 내 결과 이미지(PNG). 본인 토큰 헤더 또는 임시 서명이 붙은 주소로만 받을 수 있음 |
+| `POST /api/profile/[id]/image-link` | 내 결과 이미지의 임시 주소 발급(10분). 헤더를 붙일 수 없는 앱 내장 브라우저에서 저장·내려받기용 |
 
 ### 6.4 DB 접근 규칙
 

@@ -27,7 +27,7 @@ export const COLOR = {
 
 export async function renderImage(
   element: ReactElement,
-  options: { width?: number; height?: number; cacheControl?: string } = {},
+  options: { width?: number; height?: number; cacheControl?: string; headers?: Record<string, string> } = {},
 ): Promise<ImageResponse> {
   const [semiBold, bold] = await fonts;
   return new ImageResponse(element, {
@@ -37,7 +37,7 @@ export async function renderImage(
       { name: 'Pretendard', data: semiBold, style: 'normal', weight: 600 },
       { name: 'Pretendard', data: bold, style: 'normal', weight: 700 },
     ],
-    headers: { 'Cache-Control': options.cacheControl ?? OG_CACHE_CONTROL },
+    headers: { 'Cache-Control': options.cacheControl ?? OG_CACHE_CONTROL, ...options.headers },
   });
 }
 
