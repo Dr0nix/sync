@@ -117,3 +117,10 @@ export async function findProfileIdByToken(anonymousToken: string): Promise<stri
   `;
   return row?.id ?? null;
 }
+
+// 프로필의 익명 토큰. 임시 이미지 링크의 서명을 확인할 때만 쓰고, 응답으로 내보내지 않는다.
+export async function findTokenByProfileId(id: string): Promise<string | null> {
+  const sql = getSql();
+  const [row] = await sql`SELECT anonymous_token FROM ${table('profiles')} WHERE id = ${id}`;
+  return row?.anonymous_token ?? null;
+}
