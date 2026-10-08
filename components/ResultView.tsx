@@ -7,7 +7,7 @@ import { clearPendingInvite, readPendingInvite, readToken } from '@/lib/quiz/sto
 import { InsightCard } from './InsightCard.tsx';
 import { InviteCTA } from './InviteCTA.tsx';
 import { SaveImageButton } from './SaveImageButton.tsx';
-import { SyncSummaryCard } from './SyncSummaryCard.tsx';
+import { SyncList } from './SyncList.tsx';
 import { TasteDna } from './TasteDna.tsx';
 import { TypeHeroCard } from './TypeHeroCard.tsx';
 
@@ -103,23 +103,7 @@ export function ResultView({ profileId }: { profileId: string }) {
       <SaveImageButton profileId={result.profileId} />
 
       {/* 싱크로율은 내 결과 설명이 전부 끝난 뒤에 나온다. */}
-      {result.matches.length > 0 && (
-        <section id="sync" className="flex scroll-mt-5 flex-col gap-3">
-          <h2 className="text-xl font-bold tracking-tight">친구와의 SYNC</h2>
-          <div className="flex flex-col gap-2">
-            {result.matches.map(match => (
-              <SyncSummaryCard
-                key={match.matchId}
-                matchId={match.matchId}
-                me={result.nickname}
-                friend={match.nickname}
-                score={match.score}
-                gradeName={match.gradeName}
-              />
-            ))}
-          </div>
-        </section>
-      )}
+      <SyncList me={result.nickname} matches={result.matches} />
 
       <InviteCTA typeName={result.type.name} />
       <Link
