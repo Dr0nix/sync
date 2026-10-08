@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
+import { INTERMISSIONS } from '../content/ui-copy.ts';
 import {
   answerCurrent, emptyDraft, firstUnanswered, goBack, isComplete, isIntermission, restoreDraft,
   type Draft,
@@ -87,11 +88,19 @@ describe('restoreDraft', () => {
 });
 
 describe('isIntermission', () => {
-  it('10문항마다이고 처음과 마지막 뒤에는 없다', () => {
+  it('20문항마다이고 처음과 마지막 뒤에는 없다', () => {
     assert.equal(isIntermission(0, 60), false);
-    assert.equal(isIntermission(9, 60), false);
-    assert.equal(isIntermission(10, 60), true);
-    assert.equal(isIntermission(50, 60), true);
+    assert.equal(isIntermission(10, 60), false);
+    assert.equal(isIntermission(19, 60), false);
+    assert.equal(isIntermission(20, 60), true);
+    assert.equal(isIntermission(40, 60), true);
+    assert.equal(isIntermission(50, 60), false);
     assert.equal(isIntermission(60, 60), false);
+  });
+
+  it('60문항에서는 20, 40문항 뒤 두 번만 나오고 카드 문구도 그 수만큼 있다', () => {
+    const points = Array.from({ length: 61 }, (_, i) => i).filter(i => isIntermission(i, 60));
+    assert.deepEqual(points, [20, 40]);
+    assert.equal(INTERMISSIONS.length, points.length);
   });
 });

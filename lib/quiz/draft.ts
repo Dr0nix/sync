@@ -1,7 +1,7 @@
 // 테스트 진행 상태(응답 버퍼). localStorage에 그대로 저장되는 순수 데이터와 그 전이 함수.
 import type { TestQuestion } from './types.ts';
 
-export const INTERMISSION_EVERY = 10;
+export const INTERMISSION_EVERY = 20;
 
 export type Draft = {
   version: number;
