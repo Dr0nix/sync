@@ -108,6 +108,18 @@ export async function loadOwnProfile(id: string, anonymousToken: string): Promis
   };
 }
 
+// id와 토큰이 둘 다 맞는 프로필을 지운다. 응답·초대코드·매치는 외래키 CASCADE로 함께 지워진다.
+// 지운 게 없으면 false다. 남의 프로필과 없는 프로필을 구분하지 않는다.
+export async function deleteOwnProfile(id: string, anonymousToken: string): Promise<boolean> {
+  const sql = getSql();
+  const rows = await sql`
+    DELETE FROM ${table('profiles')}
+    WHERE id = ${id} AND anonymous_token = ${anonymousToken}
+    RETURNING id
+  `;
+  return rows.length > 0;
+}
+
 // 토큰의 주인 프로필 id. 테스트를 마친(채점된) 프로필만 찾는다.
 export async function findProfileIdByToken(anonymousToken: string): Promise<string | null> {
   const sql = getSql();

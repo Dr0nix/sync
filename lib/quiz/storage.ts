@@ -96,3 +96,9 @@ const INVITE_KEY = 'sync.pendingInvite';
 export const readPendingInvite = (): string | null => read(INVITE_KEY);
 export const savePendingInvite = (code: string) => write(INVITE_KEY, code);
 export const clearPendingInvite = () => write(INVITE_KEY, null);
+
+// 결과를 지운 뒤 이 브라우저에 남은 흔적을 모두 비운다. 다음 테스트는 새 토큰, 새 프로필로 시작한다.
+export function forgetProfile() {
+  [TOKEN_KEY, DRAFT_KEY, PROFILE_KEY, INVITE_KEY].forEach(key => write(key, null));
+  profileListeners.forEach(notify => notify());
+}
