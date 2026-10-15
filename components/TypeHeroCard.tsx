@@ -2,14 +2,14 @@
 export function TypeHeroCard({
   nickname, name, tagline, subtypeName,
 }: {
-  nickname: string;
+  nickname?: string;   // 없으면 "○○님은" 줄을 그리지 않는다(타입 소개 페이지)
   name: string;
   tagline: string;
   subtypeName?: string | null;
 }) {
   return (
     <section className="rounded-3xl bg-violet-600 px-6 py-8 text-white">
-      <p className="text-base font-medium text-violet-100">{nickname}님은</p>
+      {nickname && <p className="text-base font-medium text-violet-100">{nickname}님은</p>}
       <h1 className="mt-1 text-4xl font-extrabold leading-tight tracking-tight break-keep">{name}</h1>
       <p className="mt-3 text-lg font-medium text-violet-50 break-keep">{tagline}</p>
       {subtypeName && (
