@@ -9,7 +9,7 @@ import { findInviter } from '@/lib/db/invites.ts';
 export async function generateMetadata(props: PageProps<'/i/[inviteCode]'>): Promise<Metadata> {
   const { inviteCode } = await props.params;
   const inviter = await findInviter(inviteCode);
-  if (!inviter) return {};
+  if (!inviter) return { robots: { index: false, follow: false } };
 
   const title = INVITE_PREVIEW.title(inviter.nickname);
   const { description } = INVITE_PREVIEW;
@@ -17,6 +17,7 @@ export async function generateMetadata(props: PageProps<'/i/[inviteCode]'>): Pro
     title,
     description,
     openGraph: { title, description, url: `/i/${inviteCode}` },
+    robots: { index: false, follow: false },
   };
 }
 
