@@ -1,8 +1,9 @@
 // GET /api/profile/[id] — 본인 결과 조회. x-anonymous-token 헤더가 프로필의 토큰과 같아야 한다 (스펙 §6.3)
+// DELETE /api/profile/[id] — 본인 결과 삭제. 같은 헤더로 본인을 확인한다 (스펙 §12)
 import type { ProfileResult } from '@/lib/api/profile-result.ts';
 import { isUuid } from '@/lib/api/submit-input.ts';
 import { listFriendMatches } from '@/lib/db/matches.ts';
-import { loadOwnProfile } from '@/lib/db/profiles.ts';
+import { deleteOwnProfile, loadOwnProfile } from '@/lib/db/profiles.ts';
 import { TYPE_CONTENT } from '@/lib/scoring/v1/content.ts';
 import { selectInsights } from '@/lib/scoring/v1/insights.ts';
 import { gradeFor } from '@/lib/scoring/v1/sync-grade.ts';
@@ -36,4 +37,13 @@ export async function GET(request: Request, ctx: RouteContext<'/api/profile/[id]
     } satisfies ProfileResult,
     { headers: { 'Cache-Control': 'private, no-store' } },
   );
+}
+
+export async function DELETE(request: Request, ctx: RouteContext<'/api/profile/[id]'>) {
+  const { id } = await ctx.params;
+  const token = request.headers.get('x-anonymous-token');
+  if (!isUuid(id) || !isUuid(token)) return notFound();
+
+  if (!(await deleteOwnProfile(id, token.toLowerCase()))) return notFound();
+  return new Response(null, { status: 204 });
 }
