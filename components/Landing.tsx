@@ -36,6 +36,10 @@ export function Landing() {
         </div>
       </div>
 
+      <Link href="/types" className="self-center text-base font-semibold text-violet-700">
+        12가지 타입 전부 보기 ›
+      </Link>
+
       <div className="sticky bottom-0 mt-auto flex flex-col gap-1 bg-gradient-to-t from-white from-80% to-transparent pt-6 pb-2">
         <Link
           href="/test"

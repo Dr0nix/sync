@@ -9,7 +9,7 @@ import { gradeFor } from '@/lib/scoring/v1/sync-grade.ts';
 export async function generateMetadata(props: PageProps<'/match/[matchId]'>): Promise<Metadata> {
   const { matchId } = await props.params;
   const match = isUuid(matchId) ? await loadMatchSummary(matchId) : null;
-  if (!match) return { title: '우리의 SYNC | SYNC' };
+  if (!match) return { title: '우리의 SYNC | SYNC', robots: { index: false, follow: false } };
 
   const grade = gradeFor(match.score);
   const title = MATCH_PREVIEW.title(match.a, match.b, match.score);
@@ -18,6 +18,7 @@ export async function generateMetadata(props: PageProps<'/match/[matchId]'>): Pr
     title,
     description,
     openGraph: { title, description, url: `/match/${matchId}` },
+    robots: { index: false, follow: false },
   };
 }
 

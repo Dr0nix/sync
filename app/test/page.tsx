@@ -3,7 +3,7 @@ import { connection } from 'next/server';
 import { TestFlow } from '@/components/TestFlow.tsx';
 import { TEST_VERSION, loadTestQuestions } from '@/lib/db/questions.ts';
 
-export const metadata: Metadata = { title: '취향 테스트 | SYNC' };
+export const metadata: Metadata = { title: '취향 테스트 | SYNC', robots: { index: false, follow: false } };
 
 export default async function TestPage() {
   // 문항은 빌드 시점이 아니라 요청 시점의 DB에서 읽는다.
