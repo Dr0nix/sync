@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import type { ProfileResult } from '@/lib/api/profile-result.ts';
 import { clearPendingInvite, readPendingInvite, readToken } from '@/lib/quiz/storage.ts';
+import { DeleteProfileButton } from './DeleteProfileButton.tsx';
 import { InsightCard } from './InsightCard.tsx';
 import { InviteCTA } from './InviteCTA.tsx';
 import { SaveImageButton } from './SaveImageButton.tsx';
@@ -115,6 +116,7 @@ export function ResultView({ profileId }: { profileId: string }) {
       >
         다시 하기
       </Link>
+      <DeleteProfileButton profileId={result.profileId} />
     </div>
   );
 }
