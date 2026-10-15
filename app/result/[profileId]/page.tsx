@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { ResultView } from '@/components/ResultView.tsx';
 
-export const metadata: Metadata = { title: '내 취향 타입 | SYNC' };
+export const metadata: Metadata = { title: '내 취향 타입 | SYNC', robots: { index: false, follow: false } };
 
 export default async function ResultPage(props: PageProps<'/result/[profileId]'>) {
   const { profileId } = await props.params;

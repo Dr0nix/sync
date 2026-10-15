@@ -100,6 +100,9 @@ export function ResultView({ profileId }: { profileId: string }) {
       <TasteDna axes={result.axes} />
       <InsightCard title="나를 설명하는 3가지" items={result.insights} />
       <InsightCard title="내 안의 이상한 조합" items={result.paradoxes} />
+      <Link href={`/types/${result.type.id}`} className="self-center text-base font-semibold text-violet-700">
+        {result.type.name} 더 알아보기 ›
+      </Link>
       <SaveImageButton profileId={result.profileId} />
 
       {/* 싱크로율은 내 결과 설명이 전부 끝난 뒤에 나온다. */}
